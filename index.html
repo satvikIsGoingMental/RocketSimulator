@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Δv Stack — Launch Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!--
+  Stylesheets are loaded in strict source order of the original single-file build. The cascade
+  depends on it: tokens.css defines the custom properties every later file reads, and later
+  component files intentionally override earlier ones. Do not reorder these links.
+-->
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/header.css" />
+<link rel="stylesheet" href="css/stage.css" />
+<link rel="stylesheet" href="css/panels.css" />
+<link rel="stylesheet" href="css/weather.css" />
+<link rel="stylesheet" href="css/criteria.css" />
+<link rel="stylesheet" href="css/hud.css" />
+<link rel="stylesheet" href="css/transport.css" />
+<link rel="stylesheet" href="css/overlay.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <header class="top">
+    <div class="title-block">
+      <span class="eyebrow">Δv Stack / Companion</span>
+      <h1>Launch Simulator</h1>
+    </div>
+    <div class="header-actions">
+      <a class="icon-btn" id="calcLink" href="rocket-calc.html" title="Open the Δv Stack sizing calculator" aria-label="Open the Δv Stack sizing calculator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h3M13 12h3M8 16h3M13 16h3"/></svg>
+      </a>
+      <a class="icon-btn" href="rocket-designer.html" title="Open the Rocket Designer" aria-label="Open the Rocket Designer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>
+      </a>
+      <a class="icon-btn" href="mission-log.html" title="Open the Mission Log" aria-label="Open the Mission Log">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h11a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M6 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2"/><path d="M9 9h7M9 13h7"/></svg>
+      </a>
+      <button class="icon-btn" id="resetSetupBtn" title="Reset weather, vehicle selection, and zoom to defaults" aria-label="Reset setup to defaults">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="muteToggle" title="Mute sound" aria-label="Mute sound" aria-pressed="false">
+        <svg id="muteIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12"/></svg>
+      </button>
+      <button class="btn" id="launchBtn">Ignition &amp; Liftoff</button>
+      <button class="btn secondary" id="resetBtn" style="display:none;">Reset</button>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div id="canvasHost"></div>
+    <div id="srAnnounce" aria-live="polite" class="sr-only"></div>
+
+    <!-- ============ SETUP PANEL (pre-launch) ============ -->
+    <div class="setup-panel" id="setupPanel">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Vehicle</h2>
+          <span class="hint">from Δv Stack roster</span>
+        </div>
+        <div class="panel-body">
+          <div class="rocket-list" id="rocketList"></div>
+          <div class="rocket-detail" id="rocketDetail"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Flight Profile</h2>
+          <span class="hint">ascent pitch program</span>
+        </div>
+        <div class="panel-body">
+          <div class="chip-row" id="flightProfileChips" style="width:100%;">
+            <button class="chip active" data-profile="gravity-turn" style="flex:1;text-align:center;">Gravity turn</button>
+            <button class="chip" data-profile="straight-up" style="flex:1;text-align:center;">Straight up</button>
+          </div>
+          <div class="wx-note" id="flightProfileNote">Pitches over toward horizontal after 1200m so the vehicle can build the horizontal velocity an orbit needs.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Destination</h2>
+          <span class="hint">where to land</span>
+        </div>
+        <div class="panel-body">
+          <div class="chip-row" id="destinationChips" style="width:100%;">
+            <button class="chip active" data-destination="earth-orbit" style="flex:1;text-align:center;">Earth orbit</button>
+            <button class="chip" data-destination="moon" style="flex:1;text-align:center;">Moon</button>
+            <button class="chip" data-destination="mars" style="flex:1;text-align:center;">Mars</button>
+          </div>
+          <div class="wx-note" id="destinationNote">Reach orbit or escape velocity and coast — no interplanetary transfer, no landing on another body.</div>
+          <div id="destinationDvCheck"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Preflight</h2>
+          <span class="hint">computed from Δv Stack physics</span>
+        </div>
+        <div class="panel-body">
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="k">Δv</div><div class="v" id="pf_dv">—</div></div>
+            <div class="mini-stat"><div class="k">Liftoff mass</div><div class="v" id="pf_m0">—</div></div>
+            <div class="mini-stat"><div class="k">T / W</div><div class="v" id="pf_tw">—</div></div>
+            <div class="mini-stat"><div class="k">Burn time</div><div class="v" id="pf_tb">—</div></div>
+          </div>
+          <div id="pf_flag"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Weather</h2>
+          <span class="hint">affects drag &amp; launch go/no-go</span>
+        </div>
+        <div class="panel-body">
+          <div class="chip-row" id="weatherPresets"></div>
+
+          <div class="wx-field">
+            <label class="wx-label" for="wx_wind"><span>Surface wind</span><span class="wx-val" id="wx_wind_v">4 m/s</span></label>
+            <input type="range" id="wx_wind" min="0" max="35" step="0.5" value="4" aria-label="Surface wind speed" />
+          </div>
+          <div class="wx-field">
+            <label class="wx-label" for="wx_dir"><span>Wind direction</span><span class="wx-val" id="wx_dir_v">90°</span></label>
+            <input type="range" id="wx_dir" min="0" max="180" step="5" value="90" aria-label="Wind direction" />
+            <div class="wx-note">0° = headwind/tailwind, 90° = full crosswind</div>
+          </div>
+          <div class="wx-field">
+            <label class="wx-label" for="wx_shear"><span>Upper-level wind shear</span><span class="wx-val" id="wx_shear_v">22 m/s</span></label>
+            <input type="range" id="wx_shear" min="0" max="55" step="1" value="22" aria-label="Upper-level wind shear" />
+          </div>
+          <div class="wx-field">
+            <label class="wx-label" for="wx_ceil"><span>Cloud ceiling</span><span class="wx-val" id="wx_ceil_v">3000 m</span></label>
+            <input type="range" id="wx_ceil" min="200" max="9000" step="100" value="3000" aria-label="Cloud ceiling altitude" />
+          </div>
+          <div class="wx-field">
+            <label class="wx-label" for="wx_temp"><span>Temperature</span><span class="wx-val" id="wx_temp_v">18°C</span></label>
+            <input type="range" id="wx_temp" min="-20" max="42" step="1" value="18" aria-label="Temperature" />
+          </div>
+          <div class="wx-row2">
+            <div class="wx-field">
+              <label class="wx-label" for="wx_precip"><span>Precipitation</span></label>
+              <select id="wx_precip">
+                <option value="none">None</option>
+                <option value="light">Light</option>
+                <option value="heavy">Heavy</option>
+              </select>
+            </div>
+            <div class="wx-field">
+              <label class="wx-label" for="wx_lightning"><span>Lightning</span></label>
+              <select id="wx_lightning">
+                <option value="none">None</option>
+                <option value="possible">Possible</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Launch Criteria</h2>
+          <span class="hint">go / no-go breakdown</span>
+        </div>
+        <div class="panel-body">
+          <div id="lcc_overall"></div>
+          <div class="lcc-list" id="lcc_list"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ HUD (in-flight) ============ -->
+    <div class="hud" id="hud">
+      <div class="hud-clock">
+        <span class="phase" id="hud_phase">T-MINUS</span>
+        <span id="hud_time">T+00:00</span>
+      </div>
+      <div class="readout-list">
+        <div class="readout hero"><span class="k" id="hud_alt_label">Altitude</span><span class="v" id="hud_alt">0 <span class="unit">m</span></span></div>
+        <div class="readout" id="hud_eta_row" style="display:none;"><span class="k">ETA</span><span class="v" id="hud_eta">—</span></div>
+        <div class="readout" id="hud_vel_row"><span class="k" id="hud_vel_label">Velocity</span><span class="v" id="hud_vel">0 <span class="unit">m/s</span></span></div>
+        <div class="readout" id="hud_acc_row"><span class="k">Acceleration</span><span class="v" id="hud_acc">0 <span class="unit">g</span></span></div>
+        <div class="readout"><span class="k">Mass</span><span class="v" id="hud_mass">— <span class="unit">kg</span></span></div>
+        <div class="readout" id="hud_tw_row"><span class="k">Thrust / weight</span><span class="v" id="hud_tw">—</span></div>
+        <div class="readout" id="hud_q_row"><span class="k">Dynamic pressure</span><span class="v" id="hud_q">0 <span class="unit">kPa</span></span></div>
+        <div class="readout"><span class="k">Δv remaining</span><span class="v" id="hud_dvrem">— <span class="unit">m/s</span></span></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-faint); margin-bottom:4px;">
+          <span>THROTTLE</span><span id="hud_throttle_pct">0%</span>
+        </div>
+        <div class="throttle-bar"><div id="hud_throttle_bar" style="width:0%;"></div></div>
+      </div>
+      <div class="readout-list" id="hud_orbit_block" style="display:none;">
+        <div class="readout"><span class="k" id="hud_orbit_label">Orbital state</span><span class="v" id="hud_orbit_state">—</span></div>
+        <div class="readout"><span class="k">Apoapsis</span><span class="v" id="hud_apo">— <span class="unit">km alt</span></span></div>
+        <div class="readout"><span class="k">Periapsis</span><span class="v" id="hud_peri">— <span class="unit">km alt</span></span></div>
+        <div class="readout" id="hud_period_row"><span class="k">Orbital period</span><span class="v" id="hud_period">— <span class="unit">min</span></span></div>
+      </div>
+    </div>
+
+    <!-- ============ CAMERA MODE + LOG (top right) ============ -->
+    <div class="cam-row" id="camRow">
+      <div class="chip-row" id="camChips">
+        <button class="chip active" data-cam="chase">Chase</button>
+        <button class="chip" data-cam="ground">Ground</button>
+        <button class="chip" data-cam="orbit">Free orbit</button>
+      </div>
+      <div class="chip-row" id="zoomRow" title="Scroll / pinch anywhere in the 3D view to zoom — this works in every camera mode and is never controlled by altitude or speed.">
+        <button class="chip" id="zoomOutBtn" aria-label="Zoom out" style="padding:6px 9px;">−</button>
+        <span class="chip" id="zoomLabel" style="cursor:default; color:var(--text-dim);">1.00×</span>
+        <button class="chip" id="zoomInBtn" aria-label="Zoom in" style="padding:6px 9px;">+</button>
+        <button class="chip" id="zoomResetBtn" title="Reset zoom to 1.00×">Reset</button>
+      </div>
+      <div class="mission-log" id="missionLog"></div>
+    </div>
+
+    <!-- ============ TRANSPORT BAR (in-flight) ============ -->
+    <div class="transport" id="transport">
+      <button class="icon-btn" id="pauseBtn" title="Pause / resume (Space)" style="width:32px;height:32px;">
+        <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+      </button>
+      <div class="speed-row" id="speedRow">
+        <button class="speed-chip" data-speed="1">1×</button>
+        <button class="speed-chip active" data-speed="2">2×</button>
+        <button class="speed-chip" data-speed="5">5×</button>
+        <button class="speed-chip" data-speed="20">20×</button>
+        <button class="speed-chip" data-speed="60">60×</button>
+        <button class="speed-chip" data-speed="200">200×</button>
+        <button class="speed-chip" data-speed="5000" title="Interplanetary-transfer warp — fast-forwards a multi-day/month coast in minutes">5000×</button>
+        <button class="speed-chip" data-speed="100000" title="Maximum warp — for a Mars-class transfer">100000×</button>
+      </div>
+      <div class="sep"></div>
+      <div class="speed-row" id="skipRow">
+        <button class="speed-chip" data-skip="60" title="Skip ahead 60 seconds">+1m</button>
+        <button class="speed-chip" data-skip="300" title="Skip ahead 5 minutes">+5m</button>
+        <button class="speed-chip" data-skip="900" title="Skip ahead 15 minutes">+15m</button>
+        <button class="speed-chip" data-skip="3600" title="Skip ahead 1 hour">+1h</button>
+        <button class="speed-chip" data-skip="86400" title="Skip ahead 1 day">+1d</button>
+        <button class="speed-chip" data-skip="2592000" title="Skip ahead 30 days">+30d</button>
+      </div>
+      <div class="sep"></div>
+      <div class="seek-wrap">
+        <input type="range" class="seek" id="seekBar" min="0" max="3600" step="1" value="0" disabled title="Scrub through flight — drag ahead to fast-forward, even mid-flight"/>
+        <span id="seekTime" style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); white-space:nowrap; min-width:52px; text-align:right;">T+00:00</span>
+      </div>
+    </div>
+
+    <div class="loading-hint" id="loadingHint">Loading 3D engine…</div>
+
+    <!-- ============ RESULT OVERLAY ============ -->
+    <div class="result-overlay" id="resultOverlay">
+      <div class="result-card">
+        <span class="eyebrow" id="result_eyebrow">Flight Complete</span>
+        <h2 id="result_title">—</h2>
+        <p class="lede" id="result_lede">—</p>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="k" id="res_alt_label">Max altitude</div><div class="v" id="res_alt">—</div></div>
+          <div class="mini-stat"><div class="k" id="res_vel_label">Max velocity</div><div class="v" id="res_vel">—</div></div>
+          <div class="mini-stat"><div class="k" id="res_q_label">Max Q</div><div class="v" id="res_q">—</div></div>
+          <div class="mini-stat"><div class="k" id="res_tb_label">Burn duration</div><div class="v" id="res_tb">—</div></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="againBtn">Fly again</button>
+          <button class="btn secondary" id="reviewBtn">Review flight</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!--
+  three.js removed its global "build/three.js" / "build/three.min.js" scripts in r161 (they were
+  flagged deprecated from r150 and are what this file used to load directly, and what pinning at
+  r160 was one bump away from silently breaking on) — ES modules are now the only supported
+  distribution. Below, "three" resolves via this import map to the real ES module build, and every
+  module imports it as a module-scoped THREE binding instead of relying on a global.
+
+  The build is vendored into vendor/three/ rather than pulled from a CDN so the itch.io zip runs
+  with no network at all — itch serves the game inside an iframe on its own domain, and a dead or
+  blocked CDN would otherwise leave the page stuck on "Loading 3D engine…".
+-->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js"
+  }
+}
+</script>
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>

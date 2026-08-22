@@ -1,0 +1,65 @@
+/* ---------------------------------- HUD (in-flight) ---------------------------------- */
+.hud{
+  position:absolute;
+  top:16px;
+  left:16px;
+  width:270px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:10;
+  opacity:0;
+  transform:translateX(-16px);
+  pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.hud.visible{ opacity:1; transform:translateX(0); pointer-events:auto; }
+
+.hud-clock{
+  font-family:var(--font-mono);
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:.02em;
+  color:var(--text);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:12px 14px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+}
+.hud-clock .phase{
+  font-family:var(--font-display);
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+}
+
+.readout-list{ display:flex; flex-direction:column; gap:1px; background:var(--line-soft); border:1px solid var(--line-soft); border-radius:var(--radius); overflow:hidden; }
+.readout{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 12px;
+  background:var(--panel);
+}
+.readout .k{ font-size:11.5px; color:var(--text-dim); }
+.readout .v{ font-family:var(--font-mono); font-size:13.5px; font-weight:600; font-variant-numeric:tabular-nums; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
+.readout .v .unit{ font-size:10px; font-weight:400; color:var(--text-faint); }
+.readout.hero{ padding:11px 12px; background:var(--panel-2); }
+.readout.hero .v{ font-size:19px; color:var(--accent); }
+
+.throttle-bar{
+  height:6px;
+  border-radius:3px;
+  background:var(--line-soft);
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.throttle-bar > div{ height:100%; background:var(--good); transition:width .15s linear; }
+

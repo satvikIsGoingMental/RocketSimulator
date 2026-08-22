@@ -1,0 +1,26 @@
+{
+  "name": "dv-stack-launch-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Delta-v Stack Launch Simulator - vanilla HTML/CSS/JS + three.js. npm is dev tooling only; nothing here ships in the itch.io build.",
+  "type": "module",
+  "scripts": {
+    "serve": "npx --yes http-server . -p 4173 -c-1 -a 127.0.0.1",
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:parity": "playwright test --grep @parity",
+    "test:flight": "playwright test --grep @flight",
+    "test:pack": "playwright test --grep @pack",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "lint:imports": "node tools/check-imports.mjs",
+    "lint:wiring": "node tools/rewire.mjs --check",
+    "rewire": "node tools/rewire.mjs",
+    "check": "npm run lint:imports && npm run lint:wiring && npm run test:smoke && npm run test:parity",
+    "pack": "powershell -ExecutionPolicy Bypass -File tools/pack-itch.ps1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "http-server": "^14.1.1"
+  }
+}

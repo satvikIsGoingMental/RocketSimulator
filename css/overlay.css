@@ -1,0 +1,84 @@
+/* ---------------------------------- result overlay ---------------------------------- */
+.result-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(10,12,10,0.35);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+  z-index:30;
+}
+.result-overlay.visible{ opacity:1; pointer-events:auto; }
+.result-card{
+  width:min(420px, 90vw);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.result-card .eyebrow{ font-size:10.5px; }
+.result-card h2{ margin:0; font-family:var(--font-display); font-size:22px; }
+.result-card .lede{ color:var(--text-dim); font-size:13px; }
+.result-card .actions{ display:flex; gap:10px; margin-top:4px; }
+
+/* scrub / seek bar */
+.seek-wrap{ display:flex; align-items:center; gap:8px; flex:none; width:200px; }
+input[type="range"].seek{
+  flex:1;
+  accent-color:var(--accent);
+  height:4px;
+}
+
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+
+.loading-hint{
+  position:absolute;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-faint);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:6px 10px;
+  z-index:10;
+}
+
+@media (max-width: 720px){
+  .setup-panel{ width:calc(100% - 32px); }
+  .hud{ width:200px; }
+  .cam-row{ top:auto; bottom:78px; right:8px; align-items:flex-end; }
+  .cam-row .chip-row{ padding:4px; gap:4px; }
+  .cam-row .chip{ padding:5px 8px; font-size:10.5px; }
+  .mission-log{ display:none; }
+  .transport{ bottom:8px; }
+  header.top{ padding:10px 10px; gap:8px; }
+  .eyebrow{ display:none; }
+  h1{ font-size:15px; white-space:nowrap; }
+  .header-actions{ gap:5px; }
+  .icon-btn{ width:30px; height:30px; }
+  .icon-btn svg{ width:15px; height:15px; }
+  .btn{ padding:0 10px; height:30px; font-size:10px; white-space:nowrap; }
+}
+
+@media (max-width: 480px){
+  .hud{ width:168px; }
+  .hud-clock{ font-size:20px; padding:9px 10px; }
+  .readout{ padding:6px 9px; }
+  .readout .k{ font-size:10.5px; }
+  .readout .v{ font-size:12px; }
+  .readout.hero .v{ font-size:16px; }
+  header.top{ flex-wrap:wrap; row-gap:6px; }
+  .header-actions{ flex-wrap:wrap; justify-content:flex-end; }
+}

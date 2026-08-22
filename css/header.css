@@ -1,0 +1,79 @@
+/* ---------------------------------- header ---------------------------------- */
+header.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:12px 18px;
+  border-bottom:1px solid var(--line);
+  background:var(--panel);
+  box-shadow:var(--shadow);
+  z-index:20;
+  position:relative;
+}
+.title-block{ display:flex; flex-direction:column; gap:1px; }
+.eyebrow{
+  font-family:var(--font-display);
+  font-size:10px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+}
+h1{
+  margin:0;
+  font-family:var(--font-display);
+  font-size:19px;
+  font-weight:700;
+  letter-spacing:0.01em;
+}
+.header-actions{ display:flex; align-items:center; gap:8px; }
+
+.icon-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:var(--radius);
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--text);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:border-color .15s ease, transform .15s ease, background .15s ease;
+}
+.icon-btn:hover{ border-color:var(--accent-line); background:var(--panel-2); }
+.icon-btn:active{ transform:translateY(1px); }
+.icon-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.icon-btn svg{ width:18px; height:18px; }
+
+.btn{
+  font-family:var(--font-display);
+  font-size:11.5px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  font-weight:700;
+  padding:0 16px;
+  height:36px;
+  border-radius:var(--radius);
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:var(--accent-ink);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:filter .15s ease, transform .15s ease, opacity .15s ease;
+}
+.btn:hover{ filter:brightness(1.06); }
+.btn:active{ transform:translateY(1px); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn.secondary{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--line);
+}
+.btn.secondary:hover{ border-color:var(--accent-line); background:var(--panel-2); }
+

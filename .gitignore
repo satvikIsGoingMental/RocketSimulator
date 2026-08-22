@@ -1,0 +1,13 @@
+# dev tooling only - none of this is part of the shipped game
+node_modules/
+dist/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# editor / OS noise
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
